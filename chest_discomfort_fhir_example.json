@@ -1,0 +1,188 @@
+{
+  "resourceType": "Observation",
+  "id": "chest-discomfort-20260419-001",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/StructureDefinition/Observation"
+    ]
+  },
+  "language": "zh-TW",
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns='http://www.w3.org/1999/xhtml'>民眾主訴：胸口悶悶的，像有東西壓住，呼吸有點喘，已持續約30分鐘，疼痛程度7分</div>"
+  },
+  "_comment_scenario": "情境：55歲男性，王先生，由家屬陪同就診。家屬描述：他說胸口悶悶的，左邊比較明顯，像有東西壓著，喘不過氣，還一直冒冷汗，大概半小時了。",
+  "status": "preliminary",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "survey",
+          "display": "Survey"
+        }
+      ],
+      "text": "主訴調查"
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "29857009",
+        "display": "Chest pain"
+      },
+      {
+        "system": "http://loinc.org",
+        "code": "75325-1",
+        "display": "Symptom"
+      }
+    ],
+    "text": "胸部不舒服"
+  },
+  "subject": {
+    "reference": "Patient/patient-wang-001",
+    "display": "王先生"
+  },
+  "effectiveDateTime": "2026-04-19T10:30:00+08:00",
+  "recorded": "2026-04-19T10:35:00+08:00",
+  "performer": [
+    {
+      "display": "家屬（女兒）"
+    }
+  ],
+  "note": [
+    {
+      "text": "民眾日常語言描述（由家屬代述）：他說胸口悶悶的，左邊比較嚴重，像有東西一直壓著，喘不過氣來，一直在冒冷汗，手也有點麻麻的，整個人很不對勁，症狀大概從早上九點多開始，已持續將近半小時。"
+    }
+  ],
+  "bodySite": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "80248007",
+        "display": "Left side of thorax"
+      }
+    ],
+    "text": "左胸（左邊胸口）"
+  },
+  "component": [
+    {
+      "_comment": "【組件1】疼痛/不適程度 — Quantity 0-10",
+      "code": {
+        "coding": [
+          {
+            "system": "http://loinc.org",
+            "code": "72514-3",
+            "display": "Pain severity - 0-10 numeric rating [Score] - Reported"
+          }
+        ],
+        "text": "疼痛／不適程度（民眾自述，0-10分）"
+      },
+      "valueQuantity": {
+        "value": 7,
+        "unit": "{score}",
+        "system": "http://unitsofmeasure.org",
+        "code": "{score}"
+      }
+    },
+    {
+      "_comment": "【組件2】感覺類型：壓迫感/悶重感",
+      "code": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "275300001",
+            "display": "Heaviness"
+          }
+        ],
+        "text": "壓迫感／悶重感（胸口悶悶的、像有東西壓住）"
+      },
+      "valueBoolean": true
+    },
+    {
+      "_comment": "【組件3】感覺類型：緊縮感",
+      "code": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "13197004",
+            "display": "Chest tightness"
+          }
+        ],
+        "text": "緊縮感（胸口緊緊的）"
+      },
+      "valueBoolean": false
+    },
+    {
+      "_comment": "【組件4】伴隨症狀：呼吸困難",
+      "code": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "230145002",
+            "display": "Difficulty breathing"
+          }
+        ],
+        "text": "呼吸困難（喘不過氣）"
+      },
+      "valueBoolean": true
+    },
+    {
+      "_comment": "【組件5】伴隨症狀：冒冷汗",
+      "code": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "415690000",
+            "display": "Sweating"
+          }
+        ],
+        "text": "冒冷汗"
+      },
+      "valueBoolean": true
+    },
+    {
+      "_comment": "【組件6】伴隨症狀：手臂發麻",
+      "code": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "44077006",
+            "display": "Feeling of numbness"
+          }
+        ],
+        "text": "手臂發麻（手麻麻的）"
+      },
+      "valueBoolean": true
+    },
+    {
+      "_comment": "【組件7】伴隨症狀：噁心 — 未出現",
+      "code": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "422587007",
+            "display": "Nausea"
+          }
+        ],
+        "text": "噁心想吐"
+      },
+      "valueBoolean": false
+    },
+    {
+      "_comment": "【組件8】伴隨症狀：頭暈 — 未出現",
+      "code": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "404640003",
+            "display": "Dizziness"
+          }
+        ],
+        "text": "頭暈頭昏"
+      },
+      "valueBoolean": false
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+代碼,代碼系統,代碼系統縮寫,英文術語,中文名稱,日常語言說明,Component類型,valueType,備註
+72514-3,http://loinc.org,LOINC,Pain severity - 0-10 numeric rating [Score] - Reported,疼痛／不適程度（0-10分）,現在有多不舒服？（0＝完全沒有，10＝極度不舒服），嚴重程度,Quantity (0–10 {score}),NRS 數值評分；固定使用 UCUM {score}
+13197004,http://snomed.info/sct,SCT,Chest tightness,緊縮感,胸口緊緊的、像被東西綁住，感覺喘不開,感覺類型,Boolean,
+275300001,http://snomed.info/sct,SCT,Heaviness,壓迫感／悶重感,胸口悶悶的、像有重物壓著，很不舒服,感覺類型,Boolean,※代碼需確認
+36349006,http://snomed.info/sct,SCT,Burning sensation,燒灼感,胸口有熱熱的、火燒般的感覺,感覺類型,Boolean,
+55145000,http://snomed.info/sct,SCT,Stabbing pain,刺痛／尖銳痛,像針在刺、像刀在割，很尖銳的痛,感覺類型,Boolean,
+410006001,http://snomed.info/sct,SCT,Pulsatile pain,跳痛／悸動感,痛的感覺跟心跳一起跳，一陣一陣的,感覺類型,Boolean,※代碼需確認
+44605009,http://snomed.info/sct,SCT,Dull pain,鈍痛／隱隱作痛,持續性的悶悶的痛，不是很尖銳，但一直在,感覺類型,Boolean,※代碼需確認
+278953008,http://snomed.info/sct,SCT,Chest discomfort,說不上來的不舒服,胸口就是怪怪的，說不清楚是什麼感覺,感覺類型,Boolean,
+230145002,http://snomed.info/sct,SCT,Difficulty breathing,呼吸困難,喘不過氣、呼吸很費力、胸口悶到無法深呼吸,伴隨症狀,Boolean,
+267036007,http://snomed.info/sct,SCT,Shortness of breath,呼吸短促,走幾步就很喘、呼吸比平常快很多,伴隨症狀,Boolean,
+415690000,http://snomed.info/sct,SCT,Sweating,冒冷汗,身體一直冒汗，特別是冷汗，沒有在運動也冒汗,伴隨症狀,Boolean,
+422587007,http://snomed.info/sct,SCT,Nausea,噁心想吐,胃很不舒服、一直想吐，或真的有吐出來,伴隨症狀,Boolean,
+404640003,http://snomed.info/sct,SCT,Dizziness,頭暈頭昏,頭很暈、感覺天旋地轉，或頭昏昏的,伴隨症狀,Boolean,
+80313002,http://snomed.info/sct,SCT,Palpitations,心跳加速／心悸,感覺心臟跳很快、亂跳，或心臟咚咚咚的感覺很強烈,伴隨症狀,Boolean,
+44077006,http://snomed.info/sct,SCT,Feeling of numbness,手臂或手指發麻,手臂、手指麻麻的，感覺像被電到，或完全沒感覺,伴隨症狀,Boolean,
+57676002,http://snomed.info/sct,SCT,Joint pain,手臂或肩部痠痛,手臂或肩膀很痠、很痛，特別是左手臂,伴隨症狀,Boolean,
+13791008,http://snomed.info/sct,SCT,Asthenia,身體虛弱無力,全身很虛、很沒力氣，感覺腳都抬不起來,伴隨症狀,Boolean,
+419045004,http://snomed.info/sct,SCT,Presyncope,快要暈倒的感覺,感覺快要暈倒、眼前突然發黑或視線模糊,伴隨症狀,Boolean,
+161891005,http://snomed.info/sct,SCT,Backache,背部疼痛,後背很痛或很悶，特別是上背部,伴隨症狀,Boolean,※代碼需確認
+367391008,http://snomed.info/sct,SCT,Malaise,全身不對勁,整個人很不舒服，說不清楚，就是感覺哪裡不對,伴隨症狀,Boolean,

@@ -1,0 +1,12 @@
+代碼,代碼系統,代碼系統縮寫,英文術語,中文名稱,日常語言說明,備註
+51185008,http://snomed.info/sct,SCT,Thoracic structure,胸部（整體）,整個胸口都不舒服，說不清楚哪一側,
+80248007,http://snomed.info/sct,SCT,Left side of thorax,左胸,左邊胸口不舒服,※代碼需臨床資訊專家確認
+54735007,http://snomed.info/sct,SCT,Right side of thorax,右胸,右邊胸口不舒服,※代碼需臨床資訊專家確認
+59820001,http://snomed.info/sct,SCT,Structure of substernal region,胸骨後方（正中央）,胸口正中間不舒服，靠近心臟那裡,
+27947004,http://snomed.info/sct,SCT,Epigastric region structure,心窩（上腹部）,心窩不舒服、胃的上方不舒服,
+91775006,http://snomed.info/sct,SCT,Structure of left shoulder,左肩,左邊肩膀不舒服,
+91774005,http://snomed.info/sct,SCT,Structure of right shoulder,右肩,右邊肩膀不舒服,
+661005,http://snomed.info/sct,SCT,Jaw region structure,下巴（下頜）,下巴或牙關不舒服,
+45048000,http://snomed.info/sct,SCT,Neck structure,頸部（脖子）,脖子不舒服,
+77568009,http://snomed.info/sct,SCT,Structure of back,背部,後背不舒服,
+53120007,http://snomed.info/sct,SCT,Upper limb structure,手臂,手臂麻木或痠痛（左或右）,

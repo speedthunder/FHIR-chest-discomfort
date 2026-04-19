@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>胸部不舒服記錄工具 | FHIR Observation</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1a56db;
+      --primary-light: #ebf5ff;
+      --primary-dark: #1e429f;
+      --success: #057a55;
+      --warning: #c27803;
+      --danger: #c81e1e;
+      --gray-bg: #f9fafb;
+    }
+    body {
+      background: var(--gray-bg);
+      font-family: 'Microsoft JhengHei', '微軟正黑體', 'Noto Sans TC', sans-serif;
+      color: #111928;
+    }
+    .page-header {
+      background: linear-gradient(135deg, #1a56db 0%, #0c4a6e 100%);
+      color: white;
+      padding: 1.75rem 2rem;
+      border-radius: 16px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 20px rgba(26,86,219,0.3);
+    }
+    .page-header h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .page-header p { font-size: 0.9rem; opacity: 0.85; margin: 0; }
+    .section-card {
+      background: white;
+      border-radius: 12px;
+      border: none;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+      margin-bottom: 1.25rem;
+      overflow: hidden;
+    }
+    .section-header {
+      background: #f3f4f6;
+      padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: #374151;
+      font-size: 1rem;
+    }
+    .section-header .icon { font-size: 1.2rem; }
+    .section-body { padding: 1.25rem; }
+
+    /* Body site radio buttons */
+    .site-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.5rem; }
+    .site-option input[type="radio"] { display: none; }
+    .site-option label {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 0.6rem 0.85rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.18s;
+      background: #fafafa;
+      width: 100%;
+      font-size: 0.92rem;
+    }
+    .site-option label:hover { border-color: var(--primary); background: var(--primary-light); }
+    .site-option input[type="radio"]:checked + label {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-weight: 600;
+    }
+    .site-option .lay-text { font-weight: 600; font-size: 0.92rem; }
+    .site-option .code-text { font-size: 0.75rem; color: #6b7280; margin-top: 2px; }
+
+    /* Checkbox toggle buttons */
+    .check-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.5rem; }
+    .check-option input[type="checkbox"] { display: none; }
+    .check-option label {
+      display: flex;
+      flex-direction: column;
+      padding: 0.6rem 0.85rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.18s;
+      background: #fafafa;
+      width: 100%;
+      font-size: 0.92rem;
+    }
+    .check-option label:hover { border-color: #6366f1; background: #f0f0ff; }
+    .check-option input[type="checkbox"]:checked + label {
+      border-color: #6366f1;
+      background: #eef2ff;
+      color: #3730a3;
+      font-weight: 600;
+    }
+    .check-option.symptom label:hover { border-color: #dc2626; background: #fef2f2; }
+    .check-option.symptom input[type="checkbox"]:checked + label {
+      border-color: #dc2626;
+      background: #fef2f2;
+      color: #991b1b;
+      font-weight: 600;
+    }
+    .check-text { font-weight: 600; font-size: 0.9rem; }
+    .check-sub { font-size: 0.75rem; color: #6b7280; margin-top: 2px; }
+    .check-option input[type="checkbox"]:checked + label .check-sub { color: inherit; opacity: 0.75; }
+
+    /* Severity slider */
+    .severity-wrap { padding: 0 0.25rem; }
+    .severity-labels { display: flex; justify-content: space-between; margin-bottom: 0.3rem; font-size: 0.78rem; color: #6b7280; }
+    .severity-gradient {
+      height: 10px;
+      border-radius: 5px;
+      background: linear-gradient(to right, #10b981, #f59e0b 50%, #ef4444);
+      margin-bottom: 0.5rem;
+    }
+    input[type="range"]#severity {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 6px;
+      border-radius: 3px;
+      outline: none;
+      background: transparent;
+      cursor: pointer;
+    }
+    input[type="range"]#severity::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid var(--primary);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      cursor: pointer;
+    }
+    .severity-display {
+      text-align: center;
+      padding: 0.75rem;
+      border-radius: 10px;
+      margin-top: 0.75rem;
+      background: #f3f4f6;
+      transition: background 0.3s;
+    }
+    .severity-score { font-size: 2.5rem; font-weight: 800; line-height: 1; }
+    .severity-desc { font-size: 0.9rem; margin-top: 0.25rem; }
+
+    /* Generate button */
+    .btn-generate {
+      font-size: 1.1rem;
+      font-weight: 600;
+      padding: 0.8rem 2.5rem;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #1a56db, #0c4a6e);
+      border: none;
+      color: white;
+      box-shadow: 0 4px 12px rgba(26,86,219,0.35);
+      transition: all 0.2s;
+    }
+    .btn-generate:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(26,86,219,0.4); color: white; }
+    .btn-reset { border-radius: 12px; padding: 0.8rem 1.75rem; font-weight: 500; }
+
+    /* JSON output */
+    .output-section { display: none; }
+    .output-header {
+      background: #1f2937;
+      color: #e5e7eb;
+      padding: 0.75rem 1.25rem;
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+    }
+    .json-pre {
+      background: #111827;
+      color: #d1d5db;
+      padding: 1.25rem;
+      border-radius: 0 0 12px 12px;
+      overflow: auto;
+      max-height: 600px;
+      font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+      font-size: 0.82rem;
+      line-height: 1.65;
+      margin: 0;
+    }
+    .json-key { color: #7dd3fc; }
+    .json-string { color: #86efac; }
+    .json-number { color: #fb923c; }
+    .json-boolean { color: #f472b6; }
+    .json-null { color: #94a3b8; }
+
+    /* Alert */
+    .alert-hint { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 10px; padding: 0.7rem 1rem; font-size: 0.88rem; color: #92400e; }
+
+    .copy-feedback { display: none; color: #10b981; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+<div class="container py-4" style="max-width: 860px;">
+
+  <!-- Header -->
+  <div class="page-header">
+    <h1>🫀 胸部不舒服記錄工具</h1>
+    <p>基於 FHIR Observation 標準 ‧ 適用於民眾、家屬及照護／社福人員<br>
+       以日常語言描述，自動轉換為標準化醫療資料格式</p>
+  </div>
+
+  <!-- 1. 基本資料 -->
+  <div class="section-card">
+    <div class="section-header"><span class="icon">📋</span>基本資料（選填）</div>
+    <div class="section-body">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label fw-semibold" for="patient-name">姓名</label>
+          <input type="text" class="form-control" id="patient-name" placeholder="例：王小明">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold" for="patient-id">中華民國身分證號</label>
+          <input type="text" class="form-control" id="patient-id" placeholder="例：A123456789"
+            oninput="validateIdInput(this)" style="text-transform:uppercase" maxlength="10">
+          <div id="id-feedback" class="mt-1 small"></div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold" for="obs-time">記錄時間</label>
+          <input type="datetime-local" class="form-control" id="obs-time">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" for="recorder">記錄者身份</label>
+          <select class="form-select" id="recorder">
+            <option value="本人">本人（民眾自己記錄）</option>
+            <option value="家屬">家屬</option>
+            <option value="照護人員">照護人員</option>
+            <option value="社福人員">社福人員</option>
+            <option value="AI輔助記錄">AI 輔助記錄</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 疼痛部位 -->
+  <div class="section-card">
+    <div class="section-header"><span class="icon">📍</span>哪個部位不舒服？（單選）</div>
+    <div class="section-body">
+      <div class="site-grid" id="bodysite-container"></div>
+    </div>
+  </div>
+
+  <!-- 3. 感覺類型 -->
+  <div class="section-card">
+    <div class="section-header"><span class="icon">💫</span>是什麼樣的感覺？（可複選）</div>
+    <div class="section-body">
+      <div class="check-grid" id="discomfort-container"></div>
+    </div>
+  </div>
+
+  <!-- 4. 疼痛程度 -->
+  <div class="section-card">
+    <div class="section-header"><span class="icon">📊</span>有多不舒服？（0–10 分）</div>
+    <div class="section-body">
+      <div class="severity-wrap">
+        <div class="severity-labels">
+          <span>0<br><small>完全沒有</small></span>
+          <span class="text-center">5<br><small>中等</small></span>
+          <span class="text-end">10<br><small>極度</small></span>
+        </div>
+        <div class="severity-gradient"></div>
+        <input type="range" id="severity" min="0" max="10" value="5" oninput="updateSeverityDisplay()">
+        <div class="severity-display" id="severity-display">
+          <div class="severity-score" id="severity-score" style="color: #f59e0b;">5</div>
+          <div class="severity-desc" id="severity-desc">中等程度不舒服（相當不舒服）</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 伴隨症狀 -->
+  <div class="section-card">
+    <div class="section-header"><span class="icon">🔍</span>還有哪些不舒服？伴隨症狀（可複選）</div>
+    <div class="section-body">
+      <div class="check-grid" id="symptom-container"></div>
+    </div>
+  </div>
+
+  <!-- 6. 日常語言描述 -->
+  <div class="section-card">
+    <div class="section-header"><span class="icon">📝</span>用自己的話描述（選填）</div>
+    <div class="section-body">
+      <textarea class="form-control" id="narrative" rows="3"
+        placeholder="例如：胸口悶悶的，像有什麼東西一直壓著，從早上開始，呼吸也很喘，走路就更喘了，左邊比較明顯……"></textarea>
+      <div class="text-muted small mt-1">不必擔心說得準不準確，用最自然的方式描述即可</div>
+    </div>
+  </div>
+
+  <!-- Generate Button -->
+  <div class="d-flex gap-3 justify-content-center mb-4">
+    <button class="btn btn-generate" onclick="generateFHIR()">
+      ⚡ 產生 FHIR Observation 記錄
+    </button>
+    <button class="btn btn-outline-secondary btn-reset" onclick="resetForm()">
+      🔄 重設
+    </button>
+  </div>
+
+  <!-- Output -->
+  <div class="output-section" id="output-section">
+    <div class="output-header">
+      <span>📄 FHIR Observation JSON</span>
+      <div class="d-flex align-items-center gap-2">
+        <span class="copy-feedback" id="copy-feedback">✅ 已複製！</span>
+        <button class="btn btn-sm btn-outline-light" onclick="copyJSON()">複製</button>
+        <button class="btn btn-sm btn-outline-light" onclick="downloadJSON()">下載 .json</button>
+      </div>
+    </div>
+    <pre class="json-pre" id="json-output"></pre>
+  </div>
+
+  <div class="alert-hint mt-4">
+    ⚠️ <strong>注意：</strong>本工具產生的 FHIR 記錄為初步資料（status: preliminary），供民眾與照護人員記錄及溝通使用。
+    SNOMED CT 代碼為建議值，正式臨床使用前請由臨床資訊學專家驗證。
+  </div>
+
+</div>
+
+<script>
+// ====================================================
+// VALUE SETS DATA
+// ====================================================
+const BODY_SITES = [
+  { id:'bs1', code:'51185008', system:'http://snomed.info/sct', display:'Thoracic structure', chinese:'胸部（整體）', lay:'整個胸口都不舒服' },
+  { id:'bs2', code:'80248007', system:'http://snomed.info/sct', display:'Left side of thorax', chinese:'左胸', lay:'左邊胸口不舒服' },
+  { id:'bs3', code:'54735007', system:'http://snomed.info/sct', display:'Right side of thorax', chinese:'右胸', lay:'右邊胸口不舒服' },
+  { id:'bs4', code:'59820001', system:'http://snomed.info/sct', display:'Structure of substernal region', chinese:'胸骨後方（正中央）', lay:'胸口正中間不舒服' },
+  { id:'bs5', code:'27947004', system:'http://snomed.info/sct', display:'Epigastric region structure', chinese:'心窩（上腹部）', lay:'心窩、胃的上方' },
+  { id:'bs6', code:'91775006', system:'http://snomed.info/sct', display:'Structure of left shoulder', chinese:'左肩', lay:'左邊肩膀' },
+  { id:'bs7', code:'91774005', system:'http://snomed.info/sct', display:'Structure of right shoulder', chinese:'右肩', lay:'右邊肩膀' },
+  { id:'bs8', code:'661005',   system:'http://snomed.info/sct', display:'Jaw region structure', chinese:'下巴（下頜）', lay:'下巴、牙關' },
+  { id:'bs9', code:'45048000', system:'http://snomed.info/sct', display:'Neck structure', chinese:'頸部', lay:'脖子' },
+  { id:'bs10',code:'77568009', system:'http://snomed.info/sct', display:'Structure of back', chinese:'背部', lay:'後背' },
+  { id:'bs11',code:'53120007', system:'http://snomed.info/sct', display:'Upper limb structure', chinese:'手臂', lay:'手臂（麻或痛）' }
+];
+
+const DISCOMFORT_TYPES = [
+  { id:'dt1', code:'275300001', system:'http://snomed.info/sct', display:'Heaviness', chinese:'壓迫感／悶重感', lay:'悶悶的、像有東西壓著' },
+  { id:'dt2', code:'13197004',  system:'http://snomed.info/sct', display:'Chest tightness', chinese:'緊縮感', lay:'胸口緊緊的、像被綁住' },
+  { id:'dt3', code:'36349006',  system:'http://snomed.info/sct', display:'Burning sensation', chinese:'燒灼感', lay:'熱熱的、像火在燒' },
+  { id:'dt4', code:'55145000',  system:'http://snomed.info/sct', display:'Stabbing pain', chinese:'刺痛／尖銳痛', lay:'像針刺、像刀割' },
+  { id:'dt5', code:'410006001', system:'http://snomed.info/sct', display:'Pulsatile pain', chinese:'跳痛／悸動', lay:'跟心跳一起一陣一陣痛' },
+  { id:'dt6', code:'44605009',  system:'http://snomed.info/sct', display:'Dull pain', chinese:'鈍痛／隱隱作痛', lay:'持續悶悶地痛，不很尖銳' },
+  { id:'dt7', code:'278953008', system:'http://snomed.info/sct', display:'Chest discomfort', chinese:'說不上來的不舒服', lay:'胸口怪怪的，說不清楚' }
+];
+
+const ASSOCIATED_SYMPTOMS = [
+  { id:'sy1',  code:'230145002', system:'http://snomed.info/sct', display:'Difficulty breathing', chinese:'呼吸困難', lay:'喘不過氣' },
+  { id:'sy2',  code:'267036007', system:'http://snomed.info/sct', display:'Shortness of breath', chinese:'呼吸短促', lay:'走幾步就很喘' },
+  { id:'sy3',  code:'415690000', system:'http://snomed.info/sct', display:'Sweating', chinese:'冒冷汗', lay:'沒運動也一直冒汗' },
+  { id:'sy4',  code:'422587007', system:'http://snomed.info/sct', display:'Nausea', chinese:'噁心想吐', lay:'噁心、想吐' },
+  { id:'sy5',  code:'404640003', system:'http://snomed.info/sct', display:'Dizziness', chinese:'頭暈頭昏', lay:'天旋地轉、頭昏沉' },
+  { id:'sy6',  code:'80313002',  system:'http://snomed.info/sct', display:'Palpitations', chinese:'心跳加速／心悸', lay:'心臟跳很快或亂跳' },
+  { id:'sy7',  code:'44077006',  system:'http://snomed.info/sct', display:'Feeling of numbness', chinese:'手臂或手指發麻', lay:'手麻麻的、像被電到' },
+  { id:'sy8',  code:'57676002',  system:'http://snomed.info/sct', display:'Joint pain', chinese:'手臂或肩部痠痛', lay:'手臂或肩膀很痠痛' },
+  { id:'sy9',  code:'13791008',  system:'http://snomed.info/sct', display:'Asthenia', chinese:'身體虛弱無力', lay:'全身很虛、腳抬不起來' },
+  { id:'sy10', code:'419045004', system:'http://snomed.info/sct', display:'Presyncope', chinese:'快要暈倒的感覺', lay:'眼前發黑、快要倒' },
+  { id:'sy11', code:'161891005', system:'http://snomed.info/sct', display:'Backache', chinese:'背部疼痛', lay:'後背很痛或很悶' },
+  { id:'sy12', code:'367391008', system:'http://snomed.info/sct', display:'Malaise', chinese:'全身不對勁', lay:'整個人不對，說不清楚' }
+];
+
+const SEVERITY_CONFIG = [
+  { color:'#10b981', bg:'#d1fae5', textColor:'#065f46', desc:'0 分 — 完全沒有不舒服' },
+  { color:'#34d399', bg:'#d1fae5', textColor:'#065f46', desc:'1 分 — 非常輕微（幾乎感覺不到）' },
+  { color:'#6ee7b7', bg:'#d1fae5', textColor:'#065f46', desc:'2 分 — 輕微（稍微有點感覺）' },
+  { color:'#a3e635', bg:'#ecfccb', textColor:'#365314', desc:'3 分 — 輕微（有感但能忍受）' },
+  { color:'#facc15', bg:'#fef9c3', textColor:'#713f12', desc:'4 分 — 中等偏輕（明顯不舒服）' },
+  { color:'#f59e0b', bg:'#fef3c7', textColor:'#78350f', desc:'5 分 — 中等（相當不舒服）' },
+  { color:'#f97316', bg:'#ffedd5', textColor:'#7c2d12', desc:'6 分 — 中等偏重（很不舒服）' },
+  { color:'#ef4444', bg:'#fee2e2', textColor:'#991b1b', desc:'7 分 — 嚴重（非常不舒服，難以正常活動）' },
+  { color:'#dc2626', bg:'#fee2e2', textColor:'#991b1b', desc:'8 分 — 嚴重（很難忍受）' },
+  { color:'#b91c1c', bg:'#fecaca', textColor:'#7f1d1d', desc:'9 分 — 極度嚴重（幾乎無法忍受）' },
+  { color:'#7f1d1d', bg:'#fecaca', textColor:'#7f1d1d', desc:'10 分 — 極度嚴重（完全無法忍受）' }
+];
+
+// ====================================================
+// RENDER FUNCTIONS
+// ====================================================
+function renderBodySites() {
+  const container = document.getElementById('bodysite-container');
+  BODY_SITES.forEach(site => {
+    const div = document.createElement('div');
+    div.className = 'site-option';
+    div.innerHTML = `
+      <input type="radio" name="bodysite" id="${site.id}" value="${site.id}">
+      <label for="${site.id}">
+        <span class="lay-text">${site.lay}</span>
+        <span class="code-text">${site.chinese}</span>
+      </label>`;
+    container.appendChild(div);
+  });
+}
+
+function renderDiscomfortTypes() {
+  const container = document.getElementById('discomfort-container');
+  DISCOMFORT_TYPES.forEach(dt => {
+    const div = document.createElement('div');
+    div.className = 'check-option';
+    div.innerHTML = `
+      <input type="checkbox" name="discomfort" id="${dt.id}" value="${dt.id}">
+      <label for="${dt.id}">
+        <span class="check-text">${dt.lay}</span>
+        <span class="check-sub">${dt.chinese}</span>
+      </label>`;
+    container.appendChild(div);
+  });
+}
+
+function renderSymptoms() {
+  const container = document.getElementById('symptom-container');
+  ASSOCIATED_SYMPTOMS.forEach(sym => {
+    const div = document.createElement('div');
+    div.className = 'check-option symptom';
+    div.innerHTML = `
+      <input type="checkbox" name="symptom" id="${sym.id}" value="${sym.id}">
+      <label for="${sym.id}">
+        <span class="check-text">${sym.lay}</span>
+        <span class="check-sub">${sym.chinese}</span>
+      </label>`;
+    container.appendChild(div);
+  });
+}
+
+// ====================================================
+// SEVERITY DISPLAY
+// ====================================================
+function updateSeverityDisplay() {
+  const val = parseInt(document.getElementById('severity').value);
+  const cfg = SEVERITY_CONFIG[val];
+  const display = document.getElementById('severity-display');
+  display.style.background = cfg.bg;
+  document.getElementById('severity-score').style.color = cfg.color;
+  document.getElementById('severity-score').textContent = val;
+  document.getElementById('severity-desc').textContent = cfg.desc;
+  document.getElementById('severity-desc').style.color = cfg.textColor;
+}
+
+// ====================================================
+// JSON SYNTAX HIGHLIGHT
+// ====================================================
+function syntaxHighlight(json) {
+  json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return json.replace(
+    /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+    match => {
+      let cls = 'json-number';
+      if (/^"/.test(match)) {
+        cls = /:$/.test(match) ? 'json-key' : 'json-string';
+      } else if (/true|false/.test(match)) {
+        cls = 'json-boolean';
+      } else if (/null/.test(match)) {
+        cls = 'json-null';
+      }
+      return `<span class="${cls}">${match}</span>`;
+    }
+  );
+}
+
+// ====================================================
+// GENERATE FHIR
+// ====================================================
+let lastGeneratedJSON = '';
+
+function generateFHIR() {
+  const patientName = document.getElementById('patient-name').value.trim();
+  const patientIdRaw = document.getElementById('patient-id').value.trim().toUpperCase();
+  // 若格式符合身分證但檢核失敗，提示使用者
+  if (/^[A-Z]\d{9}$/.test(patientIdRaw) && !validateTaiwanId(patientIdRaw)) {
+    if (!confirm('⚠️ 身分證號檢核失敗，號碼可能有誤。\n確定仍要繼續產生記錄嗎？')) return;
+  }
+  const patientId = patientIdRaw;
+  const obsTimeRaw  = document.getElementById('obs-time').value;
+  const recorder    = document.getElementById('recorder').value;
+  const narrative   = document.getElementById('narrative').value.trim();
+  const severity    = parseInt(document.getElementById('severity').value);
+
+  const selectedSiteId = document.querySelector('input[name="bodysite"]:checked');
+  const selectedDTs    = Array.from(document.querySelectorAll('input[name="discomfort"]:checked'));
+  const selectedSyms   = Array.from(document.querySelectorAll('input[name="symptom"]:checked'));
+
+  // Effective time
+  const obsTime = obsTimeRaw
+    ? new Date(obsTimeRaw).toISOString()
+    : new Date().toISOString();
+
+  // ID suffix: yyyyMMddHHmmss
+  const idSuffix = new Date().toISOString().replace(/\D/g, '').slice(0, 14);
+
+  // ---- Build components ----
+  const components = [];
+
+  // Component: Severity (Quantity)
+  const sevCfg = SEVERITY_CONFIG[severity];
+  components.push({
+    code: {
+      coding: [{
+        system: 'http://loinc.org',
+        code: '72514-3',
+        display: 'Pain severity - 0-10 numeric rating [Score] - Reported'
+      }],
+      text: `疼痛／不適程度（民眾自述，0-10分）`
+    },
+    valueQuantity: {
+      value: severity,
+      unit: '{score}',
+      system: 'http://unitsofmeasure.org',
+      code: '{score}'
+    }
+  });
+
+  // Components: Discomfort types (Boolean)
+  selectedDTs.forEach(el => {
+    const dt = DISCOMFORT_TYPES.find(d => d.id === el.value);
+    if (!dt) return;
+    components.push({
+      code: {
+        coding: [{ system: dt.system, code: dt.code, display: dt.display }],
+        text: `${dt.chinese}（${dt.lay}）`
+      },
+      valueBoolean: true
+    });
+  });
+
+  // Components: Associated symptoms (Boolean)
+  selectedSyms.forEach(el => {
+    const sym = ASSOCIATED_SYMPTOMS.find(s => s.id === el.value);
+    if (!sym) return;
+    components.push({
+      code: {
+        coding: [{ system: sym.system, code: sym.code, display: sym.display }],
+        text: `${sym.chinese}（${sym.lay}）`
+      },
+      valueBoolean: true
+    });
+  });
+
+  // ---- Build bodySite ----
+  let bodySiteObj = undefined;
+  if (selectedSiteId) {
+    const site = BODY_SITES.find(b => b.id === selectedSiteId.value);
+    if (site) {
+      bodySiteObj = {
+        coding: [{ system: site.system, code: site.code, display: site.display }],
+        text: site.chinese
+      };
+    }
+  }
+
+  // ---- Build Observation ----
+  const observation = {
+    resourceType: 'Observation',
+    id: `chest-discomfort-${idSuffix}`,
+    meta: {
+      profile: ['http://hl7.org/fhir/StructureDefinition/Observation']
+    },
+    language: 'zh-TW',
+    status: 'preliminary',
+    category: [{
+      coding: [{
+        system: 'http://terminology.hl7.org/CodeSystem/observation-category',
+        code: 'survey',
+        display: 'Survey'
+      }],
+      text: '主訴調查'
+    }],
+    code: {
+      coding: [
+        { system: 'http://snomed.info/sct', code: '29857009', display: 'Chest pain' },
+        { system: 'http://loinc.org', code: '75325-1', display: 'Symptom' }
+      ],
+      text: '胸部不舒服'
+    },
+    subject: {
+      ...(patientId ? { reference: `Patient/${patientId}` } : {}),
+      display: patientName || '（未提供姓名）'
+    },
+    effectiveDateTime: obsTime,
+    recorded: new Date().toISOString(),
+    performer: [{ display: recorder }],
+    ...(narrative ? { note: [{ text: `民眾描述：${narrative}` }] } : {}),
+    ...(bodySiteObj ? { bodySite: bodySiteObj } : {}),
+    component: components
+  };
+
+  // ---- Render output ----
+  lastGeneratedJSON = JSON.stringify(observation, null, 2);
+  document.getElementById('json-output').innerHTML = syntaxHighlight(lastGeneratedJSON);
+  const outputSection = document.getElementById('output-section');
+  outputSection.style.display = 'block';
+  setTimeout(() => outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+// ====================================================
+// UTILITY
+// ====================================================
+function resetForm() {
+  document.getElementById('patient-name').value = '';
+  document.getElementById('patient-id').value = '';
+  document.getElementById('obs-time').value = new Date().toISOString().slice(0, 16);
+  document.getElementById('recorder').value = '本人';
+  document.getElementById('narrative').value = '';
+  document.getElementById('severity').value = '5';
+  document.querySelectorAll('input[name="bodysite"]').forEach(r => r.checked = false);
+  document.querySelectorAll('input[name="discomfort"]').forEach(r => r.checked = false);
+  document.querySelectorAll('input[name="symptom"]').forEach(r => r.checked = false);
+  document.getElementById('output-section').style.display = 'none';
+  updateSeverityDisplay();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function copyJSON() {
+  if (!lastGeneratedJSON) return;
+  navigator.clipboard.writeText(lastGeneratedJSON).then(() => {
+    const fb = document.getElementById('copy-feedback');
+    fb.style.display = 'inline';
+    setTimeout(() => { fb.style.display = 'none'; }, 2000);
+  });
+}
+
+function downloadJSON() {
+  if (!lastGeneratedJSON) return;
+  const blob = new Blob([lastGeneratedJSON], { type: 'application/json' });
+  const a = document.createElement('a');
+  const idSuffix = new Date().toISOString().replace(/\D/g, '').slice(0, 14);
+  a.href = URL.createObjectURL(blob);
+  a.download = `chest_discomfort_${idSuffix}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ====================================================
+// TAIWAN ROC ID VALIDATION
+// 中華民國身分證字號檢核（依內政部戶政司規則）
+// ====================================================
+const ROC_ID_LETTER = {
+  A:10,B:11,C:12,D:13,E:14,F:15,G:16,H:17,I:34,
+  J:18,K:19,L:20,M:21,N:22,O:35,P:23,Q:24,R:25,
+  S:26,T:27,U:28,V:29,W:32,X:30,Y:31,Z:33
+};
+
+function validateTaiwanId(id) {
+  id = id.trim().toUpperCase();
+  // 格式：第1碼英文字母，第2碼1或2，後8碼數字
+  if (!/^[A-Z][12]\d{8}$/.test(id)) return false;
+  const n = ROC_ID_LETTER[id[0]];
+  const digits = [Math.floor(n / 10), n % 10, ...id.slice(1).split('').map(Number)];
+  const weights = [1, 9, 8, 7, 6, 5, 4, 3, 2, 1, 1];
+  const sum = digits.reduce((acc, d, i) => acc + d * weights[i], 0);
+  return sum % 10 === 0;
+}
+
+function validateIdInput(input) {
+  const val = input.value.trim().toUpperCase();
+  input.value = val;
+  const fb = document.getElementById('id-feedback');
+  if (val === '') { fb.innerHTML = ''; input.className = 'form-control'; return; }
+  // 只有符合身分證格式（字母+數字共10碼）才做檢核
+  if (/^[A-Z]\d{9}$/.test(val)) {
+    if (validateTaiwanId(val)) {
+      fb.innerHTML = '<span style="color:#057a55">✅ 身分證格式正確</span>';
+      input.className = 'form-control is-valid';
+    } else {
+      fb.innerHTML = '<span style="color:#c81e1e">❌ 身分證格式錯誤（檢核碼不符）</span>';
+      input.className = 'form-control is-invalid';
+    }
+  } else if (val.length >= 10) {
+    fb.innerHTML = '<span style="color:#c27803">⚠️ 不符合身分證格式（視為其他識別碼）</span>';
+    input.className = 'form-control';
+  } else {
+    fb.innerHTML = '';
+    input.className = 'form-control';
+  }
+}
+
+// ====================================================
+// INIT
+// ====================================================
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('obs-time').value = new Date().toISOString().slice(0, 16);
+  renderBodySites();
+  renderDiscomfortTypes();
+  renderSymptoms();
+  updateSeverityDisplay();
+});
+</script>
+</body>
+</html>

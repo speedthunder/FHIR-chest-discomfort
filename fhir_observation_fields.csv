@@ -1,0 +1,30 @@
+欄位名稱,FHIR路徑,資料類型,必填,中文說明,值域或範例,日常語言對應說明
+資源類型,resourceType,string,Y,固定值，標識此為觀察記錄資源,Observation,（固定不變）
+記錄識別碼,id,string,Y,每筆記錄的唯一識別碼（系統產生）,chest-discomfort-20260419-001,（系統自動產生，民眾不需填寫）
+適用規範,meta.profile[0],canonical,N,所套用的 FHIR 結構定義 URL,http://hl7.org/fhir/StructureDefinition/Observation,（技術欄位）
+語言,language,code,N,記錄語言,zh-TW,（繁體中文）
+人類可讀摘要狀態,text.status,code,N,"generated / extensions / additional / empty","generated",（系統自動產生）
+人類可讀摘要內容,text.div,xhtml,N,HTML 格式的摘要說明,<div>民眾主訴：胸口悶悶的…</div>,摘要說明給人閱讀用
+記錄狀態,status,code,Y,"registered（已登錄）/ preliminary（初步）/ final（最終確認）/ amended（修正）/ cancelled（取消）","preliminary",這次記錄是初步還是最終確認
+觀察分類,category[0].coding[0].code,code,N,觀察的分類類型（此處用 survey 表示主訴調查）,"survey",這是主訴調查記錄
+觀察分類文字,category[0].text,string,N,分類中文說明,主訴調查,（中文標示）
+觀察內容代碼（SNOMED）,code.coding[0].system,uri,Y,使用 SNOMED CT 代碼系統,http://snomed.info/sct,（標準代碼系統）
+觀察內容代碼（SNOMED）,code.coding[0].code,string,Y,SNOMED CT 代碼，29857009 = Chest pain（胸痛）,29857009,（標準代碼）
+觀察內容代碼（LOINC）,code.coding[1].code,string,N,LOINC 代碼，75325-1 = Symptom（症狀）,75325-1,（補充代碼）
+觀察內容中文說明,code.text,string,N,用中文說明觀察內容,胸部不舒服,「胸部不舒服」
+觀察對象（病人）參考,subject.reference,string,Y,病人資源的 FHIR 參考路徑,Patient/patient-001,連結到病人資料
+觀察對象顯示名稱,subject.display,string,N,病人的顯示名稱,王小明,民眾的姓名
+觀察時間,effectiveDateTime,dateTime,Y,症狀發生或觀察的時間（ISO 8601 格式）,2026-04-19T10:30:00+08:00,「什麼時候開始不舒服」或「記錄時間」
+記錄時間,recorded,dateTime,N,實際輸入記錄的時間,2026-04-19T10:35:00+08:00,照護人員實際記錄的時間
+記錄者,performer[0].display,string,N,記錄或觀察者的名稱,家屬（女兒）,「誰做的記錄？」
+日常語言文字描述,note[0].text,string,N,民眾用自然語言描述的狀況（自由文字）,"胸口悶悶的，像有東西壓住，呼吸有點喘",民眾自己說的話或照護者的描述
+疼痛部位代碼系統,bodySite.coding[0].system,uri,N,SNOMED CT 身體部位代碼系統,http://snomed.info/sct,（標準代碼系統）
+疼痛部位代碼,bodySite.coding[0].code,string,N,SNOMED CT 身體部位代碼（詳見 bodysite_valueset.csv）,80248007,（請見部位代碼表）
+疼痛部位中文說明,bodySite.text,string,N,用中文說明疼痛部位,左胸（左邊胸口）,「哪個部位不舒服？」
+組件代碼系統,component[n].code.coding[0].system,uri,Y（component必填）,組件項目的代碼系統,http://loinc.org 或 http://snomed.info/sct,（標準代碼系統）
+組件代碼,component[n].code.coding[0].code,string,Y（component必填）,組件項目的代碼（詳見 component_valueset.csv）,72514-3（疼痛程度）,（請見組件代碼表）
+組件中文說明,component[n].code.text,string,N,組件項目的中文說明,疼痛／不適程度（0-10分）,「有多不舒服？」
+組件數值（數量型）,component[n].valueQuantity.value,decimal,條件必填,疼痛程度用此欄位；0-10 的數字,7,民眾說：「大概7分，很不舒服」
+組件數值（數量型）單位,component[n].valueQuantity.unit,string,條件必填,UCUM 單位碼 {score} 表示無量綱評分,{score},（技術欄位）
+組件數值（數量型）代碼系統,component[n].valueQuantity.system,uri,條件必填,UCUM 代碼系統,http://unitsofmeasure.org,（技術欄位）
+組件數值（布林型）,component[n].valueBoolean,boolean,條件必填,"症狀是否出現：true（有）/ false（沒有）",true,「有這個症狀嗎？有的話就是 true」
